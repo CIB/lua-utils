@@ -1,11 +1,47 @@
-parser = { text = "", pos = 1, line = 1 }
+-- This module contains a few very simple helpers for parsing text with lua.
+-- 
+-- The basic idea behind is that the parsing state(parsed text, current position, current line)
+-- will be kept in a central state object, from which you can do various operations, such as
+-- checking what the next text will be, advancing the cursor, and so on.
 
--- returns true if we are done parsing the text
+-- SUMMARY:
+-- parser.text - text to parse, set this before starting parsing
+-- parser.pos  - current position in the text, as usual with lua, "1" means "before the first character"
+-- parser.line - current line in the text, will automatically be updated by all functions that advance the cursor
+--
+-- parser:at_end()              - returns whether the cursor is at the end of the input stream
+--
+-- == LOOKAHEAD FUNCTIONS == 
+-- parser:get_next(amount)      - returns the next @amount characters ahead in the stream, 
+--                                or nil if not that many chars are left
+-- parser:get_char()            - returns the next char ahead in the stream, or nil if we're at the end
+-- parser:is_next(text)         - checks if @text comes next in the stream, returns true if yes, false otherwise
+
+-- parser:is_next_pattern       - matches the string ahead against a lua expression
+--                                returns nil if the match failed, 
+--                                otherwise a pair of the matched string, and a table containing all captures
+--                                see http://lua-users.org/wiki/PatternsTutorial for more info about patterns
+-- 
+-- == FUNCTIONS THAT ADVANCE THE CURSOR ==
+-- parser:skip_amount(amount)   - Advance the cursor by @amount characters, while updating the current line number accordingly
+-- parser:skip(text)            - Check if @text is directly after the cursor, and if so, skip past it
+-- parser:skip_pattern(text)    - matches the string ahead against a lua pattern, and skips it if successful
+--                                returns the same as parser:is_next_pattern
+-- parser:skip_spaces()         - Advances the cursor beyond all upcoming spaces(\s or \t)
+
+-- The parser state object, copy this for personal use
+parser = { 
+    text = "", 
+    pos = 1, 
+    line = 1 
+}
+
+-- returns true if the cursor is at the end of the text
 function parser:at_end()
   return (self.pos > self.text:len())
 end
 
--- returns the next @amount characters ahead in the stream, or nil if not that many chars are left
+-- returns the next @amount characters ahead in the text, or nil if not that many chars are left
 function parser:get_next(amount)
 	if self.pos + amount > self.text:len() then
 		return nil
