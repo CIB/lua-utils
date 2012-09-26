@@ -3,6 +3,8 @@
 -- The basic idea behind is that the parsing state(parsed text, current position, current line)
 -- will be kept in a central state object, from which you can do various operations, such as
 -- checking what the next text will be, advancing the cursor, and so on.
+--
+-- See `parser_example.lua` for a simple "howto"
 
 -- SUMMARY:
 -- parser.text - text to parse, set this before starting parsing
@@ -70,13 +72,19 @@ end
 
 -- skips a given amount of characters
 function parser:skip_amount(amount)
+    local start = self.pos
     for i = 1, amount do
         local chr = self.text[self.pos]
         if chr == "\n" then
             self.line = self.line + 1
         end
         self.pos = self.pos + 1
+        
+        -- if we're at the end of the stream already, abort
+        if self:at_end() then break end
     end
+    
+    return self.text:sub(start, self.pos-1)
 end
 
 -- checks if @word is ahead in the stream, and if so, skips past it, otherwise does nothing
@@ -129,4 +137,14 @@ end
 -- skips all upcoming spaces(\s or \t)
 function parser:skip_spaces()
     self:skip_pattern("[ \t]*")
+end
+
+-- skips to the next line
+function parser:skip_to_next_line()
+    local rval = ""
+    while not self:skip("\n") and not self:at_end() do
+        rval = rval .. self:skip_amount(1)
+    end
+    
+    return rval
 end
