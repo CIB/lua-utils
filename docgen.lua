@@ -1,15 +1,6 @@
 -- This module manages parsing special lua comment syntax into documentation metadata,
 -- and generating HTML from this metadata.
 
---** Foobar
---* Lorem Ipsum is simply dummy text of the printing and typesetting 
---  industry. Lorem Ipsum has been the industry's standard dummy text ever 
---  since the 1500s, when an unknown printer took a galley of type and scrambled it 
---  to make a type specimen book. It has survived not only five centuries, but also the leap 
---  into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s 
---  with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
---  publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
 require "parser_utils"
 require "utils"
 
@@ -18,16 +9,28 @@ local tag_head = "head"
 
 local comment_symbol_translation =
 {
-    ["@"] = "codeblock",
+    ["@"] = "code",
     ["?"] = "desc",
     ["!"] = "param"
 }
 
+--** markup_content
+--*@ parsed_content = markup_content(input_content)
+--*? Parses the simple markup contained in @input_content and generates HTML for it,
+--   e.g. translates *foobar* into <b>foobar</b>
+function markup_content(input_text)
+    local replacer = function(capture)
+        return "<b>"..capture.."</b>"
+    end
+    
+    return input_text.gsub(input_text, "%*(.-)%*", replacer)
+end
+
 --** parse_file
 --*@  parse_file(input_text, output_table)
 --*?  Parses a lua file, extracting information from comments and putting it into @output_table
---*!  input_text:  The text contents of the lua file to parse
---*!  output_text: A table to generate the extracted information into
+--*!  *input_text*:  The text contents of the lua file to parse
+--*!  *output_text*: A table to generate the extracted information into
 function parse_file(input_text, output_table)
     -- get a local parser instance
     local parser = clone(parser)
@@ -77,16 +80,17 @@ function parse_file(input_text, output_table)
     end
 end
 
---* store_comment_type(parser, output_table)
---* Stores the comment the parser has last parsed into the output table,
---* then resets the parser's comment.
+--** store_comment_type
+--*@ store_comment_type(parser, output_table)
+--*? Stores the comment the parser has last parsed into the output table,
+--   then resets the parser's comment.
 function store_comment_type(parser, output_table)
     -- if there's no comment, do nothing
     if parser.current_comment_type == nil then return end
 
     local new_entry = {
         type = parser.current_comment_type,
-        value = parser.current_comment_value
+        value = markup_content(parser.current_comment_value)
     }
     
     table.insert(output_table, new_entry)
@@ -96,26 +100,26 @@ function store_comment_type(parser, output_table)
 end
 
 --** generate_html
---*  html = generate_html(metadata)
---*  Takes a table with metadata as populated by `parse_file` and generates an HTML document from it.
+--*@ html = generate_html(metadata)
+--*? Takes a table with metadata as populated by `parse_file` and generates an HTML document from it.
 function generate_html(metadata)
-    html = "<html><head><title>Documentation Test</title></head><body>"
+    html = "<html><head><title>Documentation Test</title><link rel='stylesheet' type='text/css' media='all' href='./docgen.css' /></head><body>"
     
     -- generate the TOC
-    html = html .. "<div class='tocBox'>\n"
-    html = html .. "<div class='tocHead'>Table of Contents</div>\n"
+    html = html .. "<div class='toc_box'>\n"
+    html = html .. "<div class='toc_head'>Table of Contents</div>\n"
     for i, entry in ipairs(metadata) do
         if entry.type == tag_head then
-            html = html .. "<div class='tocEntry'><a href='#"..tostring(i).."'>"..entry.value.."</a></div>\n"
+            html = html .. "<div class='toc_line'><a href='#"..tostring(i).."'>"..entry.value.."</a></div>\n"
         end
     end
     html = html .. "</div>\n"
     
     -- generate the body
-    html = html .. "<div class='docBox'>\n"
+    html = html .. "<div class='doc_box'>\n"
     for i, entry in ipairs(metadata) do
         if entry.type == tag_head then
-            html = html .. "<div class='docHead'><a name='"..tostring(i).."'>"..entry.value.."</a></div>\n"
+            html = html .. "<div class='doc_"..entry.type.."'><a name='"..tostring(i).."'>"..entry.value.."</a></div>\n"
         else
             html = html .. "<div class='doc_"..entry.type.."'>"..entry.value.."</div>\n"
         end
@@ -125,4 +129,14 @@ function generate_html(metadata)
     html = html.."</body></html>"
     
     return html
+end
+
+function test()
+    input = io.open("parser_utils.lua"):read("*a")
+    output_table = {}
+    parse_file(input, output_table)
+    html = generate_html(output_table)
+    file = io.open("new.html","w")
+    file:write(html)
+    file:close()
 end

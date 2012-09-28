@@ -1,0 +1,58 @@
+﻿body {
+  margin:         5%;
+}
+
+
+div.toc_box {
+  margin-bottom:  20pt;
+}
+
+div.doc_box {
+
+}
+
+
+div.toc_head {
+  margin-top:     15pt;
+  font-family:    sans-serif;
+  font-size:      12pt;
+  font-weight:    bold;
+  border-bottom:  2pt solid;
+  padding:        0 3pt;
+  margin-bottom:  2pt;
+}
+
+div.toc_line { 
+  padding:        0 3pt;
+  font-weight:    bold;
+  font-family:    serif;
+  font-size:      10.5pt;
+}
+
+div.doc_head { 
+  margin-top:     15pt;
+  font-family:    sans-serif;
+  font-size:      12pt;
+  font-weight:    bold;
+  border-bottom:  2pt solid;
+  padding:        0 3pt;
+  margin-bottom:  2pt;
+}
+
+div.doc_line {
+  font-family:    serif;
+  font-size:      10.5pt;
+  line-height:    130%;
+  padding:        0 3pt;
+  margin-bottom:  6pt;
+}
+
+div.doc_code {
+  font-family:    monospace;
+  font-size:      12pt;
+  line-height:    130%;
+  padding:        0 3pt;
+  margin-bottom:  6pt;
+}
+
+
