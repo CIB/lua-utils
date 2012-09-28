@@ -119,7 +119,7 @@ function generate_html(metadata)
     html = html .. "<div class='doc_box'>\n"
     for i, entry in ipairs(metadata) do
         if entry.type == tag_head then
-            html = html .. "<div class='doc_"..entry.type.."'><a name='"..tostring(i).."'>"..entry.value.."</a></div>\n"
+            html = html .. "<div class='doc_"..entry.type.."' id='"..tostring(i).."'>"..entry.value.."</div>\n"
         else
             html = html .. "<div class='doc_"..entry.type.."'>"..entry.value.."</div>\n"
         end

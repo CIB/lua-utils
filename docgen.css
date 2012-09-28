@@ -39,6 +39,10 @@ div.doc_head {
   margin-bottom:  2pt;
 }
 
+:target { 
+  background:     #FFCCAA;
+}
+
 div.doc_line {
   font-family:    serif;
   font-size:      10.5pt;
