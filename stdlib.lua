@@ -41,6 +41,17 @@ function deepcopy(object)
 end
 clone = deepcopy
 
+-----------------------------------------------------------------------------------------------
+-- copy
+-----------------------------------------------------------------------------------------------
+function copy(object)
+    local rval = {}
+    for key, value in pairs(object) do
+        rval[key] = value
+    end
+    return rval
+end
+
 
 -----------------------------------------------------------------------------------------------
 -- check (alternative to assert)
