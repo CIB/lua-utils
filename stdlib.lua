@@ -45,6 +45,10 @@ clone = deepcopy
 -- copy
 -----------------------------------------------------------------------------------------------
 function copy(object)
+    if type(object) ~= "table" then
+        return object
+    end
+
     local rval = {}
     for key, value in pairs(object) do
         rval[key] = value
@@ -438,6 +442,22 @@ function writeFile(filePath, data)
   local file = assert( io.open(filePath,"wb"), err)
   assert(file:write(data), err)
   file:close()
+end
+
+-----------------------------------------------------------------------------------------------
+-- shuffle
+-----------------------------------------------------------------------------------------------
+
+function table.shuffle(tab)
+  local size   = #tab
+  local newTab = deepcopy(tab)
+
+  for i=size, 2, -1 do
+    local randNum = math.random(i)
+    newTab[i], newTab[randNum] = newTab[randNum], newTab[i]
+  end
+
+  return newTab
 end
 
 -- ============================================================================================
