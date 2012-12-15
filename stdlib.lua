@@ -1,4 +1,4 @@
--- Various tools are contained in this file which are needed in most lua projects.
+﻿-- Various tools are contained in this file which are needed in most lua projects.
 
 -- ============================================================================================
 -- GENERIC
@@ -45,10 +45,6 @@ clone = deepcopy
 -- copy
 -----------------------------------------------------------------------------------------------
 function copy(object)
-    if type(object) ~= "table" then
-        return object
-    end
-
     local rval = {}
     for key, value in pairs(object) do
         rval[key] = value
@@ -264,6 +260,23 @@ merge = table.merge
 
 
 -----------------------------------------------------------------------------------------------
+-- shuffle
+-----------------------------------------------------------------------------------------------
+function table.shuffle(tab)
+  local size   = #tab
+  local newTab = deepcopy(tab)
+
+  for i=size, 2, -1 do
+    local randNum = math.random(i)
+    newTab[i], newTab[randNum] = newTab[randNum], newTab[i]
+  end
+
+  return newTab
+end  
+
+
+
+-----------------------------------------------------------------------------------------------
 -- length
 -----------------------------------------------------------------------------------------------
 function length(obj)
@@ -357,6 +370,38 @@ upper            = string.upper
 lower            = string.lower
 
 
+----------------------------------------------------------------------------------------------
+--** tostring_pretty
+-----------------------------------------------------------------------------------------------
+--*@ pretty_string = tostring_pretty(object)
+--*? Converts an object to a string in human-readable format.
+function tostring_pretty(object)
+    if type(object) == "table" then
+        local rval = "{"
+        for key, value in pairs(object) do
+            rval = rval .. tostring(key) .. " = '" .. tostring(value)
+            if next(object, key) then
+                rval = rval .. "', "
+            end
+        end
+        rval = rval .. "}"
+        return rval
+    else
+        return tostring(object)
+    end
+end
+
+
+----------------------------------------------------------------------------------------------
+--** pprint
+----------------------------------------------------------------------------------------------
+--*@ pprint(object)
+--*? Pretty prints an object in human-readable format.
+function pprint(object)
+    print(tostring_pretty(object))
+end
+
+
 
 -- ============================================================================================
 -- MATHS & BITOPS
@@ -444,49 +489,5 @@ function writeFile(filePath, data)
   file:close()
 end
 
------------------------------------------------------------------------------------------------
--- shuffle
------------------------------------------------------------------------------------------------
 
-function table.shuffle(tab)
-  local size   = #tab
-  local newTab = deepcopy(tab)
-
-  for i=size, 2, -1 do
-    local randNum = math.random(i)
-    newTab[i], newTab[randNum] = newTab[randNum], newTab[i]
-  end
-
-  return newTab
-end
-
--- ============================================================================================
--- PRETTY PRINTING
--- ============================================================================================
-
---** tostring_pretty
---*@ pretty_string = tostring_pretty(object)
---*? Converts an object to a string in human-readable format.
-function tostring_pretty(object)
-    if type(object) == "table" then
-        local rval = "{"
-        for key, value in pairs(object) do
-            rval = rval .. tostring(key) .. " = '" .. tostring(value)
-            if next(object, key) then
-                rval = rval .. "', "
-            end
-        end
-        rval = rval .. "}"
-        return rval
-    else
-        return tostring(object)
-    end
-end
-
---** pprint
---*@ pprint(object)
---*? Pretty prints an object in human-readable format.
-function pprint(object)
-    print(tostring_pretty(object))
-end
 
