@@ -453,6 +453,15 @@ end
 isInRange = math.isInRange
 
 
+-----------------------------------------------------------------------------------------------
+-- scale
+-----------------------------------------------------------------------------------------------
+function math.scale(x, prev_start, prev_end, new_start, new_end)
+   return new_start + (x - prev_start) * (new_end - new_start) / (prev_end - prev_start)
+end
+scale = math.scale
+
+
 
 -- ============================================================================================
 -- FILEOPS
